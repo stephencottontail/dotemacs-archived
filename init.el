@@ -3,6 +3,9 @@
 (package-initialize)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 
+;; Global keybinds
+(global-set-key (kbd "M-<SPC>") 'set-mark-command)
+
 ;; Setup stacking hydras
 ;;
 ;; see https://github.com/abo-abo/hydra/wiki/Nesting-Hydras
