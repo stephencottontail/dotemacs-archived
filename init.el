@@ -176,10 +176,9 @@
 ;; JS/React development
 (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
 (add-to-list 'auto-mode-alist '("\\.jsx\\'" . js-mode))
-;; flymake-eslint.el exposes a variable
-;; 'flymake-eslint-executable-args` which could in theory
-;; allow me to pass a different config file depending on
-;; the file, must examine this further
+;; `flymake-eslint-executable-args` could possibly be used
+;; to pass different config files depending on the file
+;; type, but I couldn't get it to work
 (use-package flymake-eslint
   :ensure t
   :init
