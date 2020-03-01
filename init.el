@@ -103,6 +103,20 @@
       (setq out (replace-regexp-in-string (car cur) (car (cdr cur)) out)))
     out))
 
+;; Let's use the default major/minor modes code and hide
+;; the minor modes I don't care about. Not because I couldn't
+;; understand the code that flymake uses to count the
+;; number of errors, mind you, I'm just making an effort
+;; to use Emacs' built-in code
+(use-package delight
+  :init (delight '((global-auto-revert-mode nil "autorevert")
+		   (auto-revert-mode nil "autorevert")
+		   (auto-revert-tail-mode nil "autorevert")
+		   (company-mode nil "company")
+		   (ivy-mode nil "ivy")
+		   (editorconfig-mode nil "editorconfig")
+		   (eldoc-mode nil "eldoc"))))
+
 (setq-default mode-line-format
 	      (list
 	       '(:eval
@@ -115,10 +129,8 @@
 			(propertize (generate-replacement-tags (buffer-file-name)) (quote face) (quote skd/replacement-tags)))
 		       (t
 			mode-line-buffer-identification)))
-	       "    ("
-	       '(:eval (propertize mode-name (quote face) (quote bold)))
-
-	       ")    "
+	       "  "
+	       '(:eval mode-line-modes)
 	       ))
 
 ;; Control how Emacs makes backups
@@ -310,7 +322,7 @@
  '(custom-safe-themes
    '("998f0949f8abd0ad3ca9a210c455ccf2f75e7273bedfd1da48e889acc38bacf9" "9324e79bc126f49a289aaccbe207b3ba6f2ce7ebc077ca6eb96f9864ecf860c2" default))
  '(package-selected-packages
-   '(flymake-sass flymake-css flymake-php flymake-eslint undo-tree editorconfig projectile-ripgrep ripgrep hydra ivy-hydra counsel-projectile projectile counsel ivy swiper forge magit rjsx-mode key-chord yasnippet web-mode company-lsp lsp-mode lsp-ui use-package abyss-theme)))
+   '(delight flymake-sass flymake-css flymake-php flymake-eslint undo-tree editorconfig projectile-ripgrep ripgrep hydra ivy-hydra counsel-projectile projectile counsel ivy swiper forge magit rjsx-mode key-chord yasnippet web-mode company-lsp lsp-mode lsp-ui use-package abyss-theme)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
