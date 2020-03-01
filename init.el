@@ -164,7 +164,11 @@
   (add-hook 'web-mode-hook 'flymake-mode))
 
 (use-package flymake-php
-  :init (add-hook 'web-mode-hook 'flymake-php-load))
+  ;; Without setting this variable, flymake was putting temp files into
+  ;; the same folder, but when I set the variable, flymake was putting
+  ;; temp files into `tmp/`, not the folder I specfied. :fancy-shrug:
+  :init (setq tempdir (concat (file-name-directory user-init-file) "flymake-php"))
+  (add-hook 'web-mode-hook 'flymake-php-load))
 
 ;; flymake-sass seems to be a bit out-of-date and
 ;; I don't have the time or the inclination to wrangle it
