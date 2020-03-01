@@ -80,57 +80,14 @@
 ;; introduce it to LC projects; i need to research if
 ;; i can set a global configuration file that wouldn't
 ;; need to be included in an LC repo
-(use-package flycheck
-  :ensure t
-  :bind ("C-c f" . skd/flycheck-hydra/body)
-  :init (add-hook 'flycheck-status-changed-functions #'flycheck-mode-line-text)
-  (add-hook 'flycheck-mode-hook #'flycheck-mode-line-text)
-  :config (global-flycheck-mode 1)
-  (flycheck-add-mode (quote php) (quote web-mode)))
+(require 'flymake)
 
-(defface skd/flycheck-error-status '((t)) "If Flycheck reports an error during a check" :group (quote skd-custom-font-faces))
-(defface skd/flycheck-interrupted-status '((t)) "If Flycheck is interrupted while performing a check" :group (quote skd-custom-font-faces))
-(defface skd/flycheck-suspicious-status '((t)) "If Flycheck reports a suspicious state during a check" :group (quote skd-custom-font-faces))
-(defface skd/flycheck-error-count '((t)) "The number of errors that Flycheck reports" :group (quote skd-custom-font-faces))
-(defface skd/flycheck-warning-count '((t)) "The number of warnings that Flycheck reports" :group (quote skd-custom-font-faces))
-(defface skd/flycheck-info-count '((t)) "The number of informational messages that Flycheck reports" :group (quote skd-custom-font-faces))
 
-(defun flycheck-mode-line-text (&optional status)
-  "Return appropriate mode line text depending on STATUS."
-  (let ((text
-	 (pcase (or flycheck-last-status-change)
-	   ('finished (when flycheck-current-errors
-			(let-alist (flycheck-count-errors flycheck-current-errors)
-			  (let ((error (or .error 0))
-				(warning (or .warning 0))
-				(info (or .info 0)))
-			    (format " %s/%s/%s"
-				    (propertize (number-to-string error) (quote face) (quote skd/flycheck-error-count))
-				    (propertize (number-to-string warning) (quote face) (quote skd/flycheck-warning-count))
-				    (propertize (number-to-string info) (quote face) (quote skd/flycheck-info-count)))))))
-	   ('not-checked nil)
-	   ('no-checker (propertize " -" (quote face) (quote bold)))
-	   ('running nil)
-	   ('errored (propertize " !" (quote face) (quote skd/flychecker-error-status)))
-	   ('interrupted (propertize " X" (quote face) (quote skd/flychecker-interrupted-status)))
-	   ('suspicious (propertize " ?" (quote face) (quote skd/flychecker-suspicious-status)))
-	   (_ nil))))
-    (concat " / Fly" text)))
 
-(defhydra skd/flycheck-hydra (:pre (flycheck-list-errors) :post (quit-windows-on "*Flycheck errors*") :hint nil)
-  "
- Errors^^
--------------------------------------------------------------------------------------
- [_j_] next
- [_k_] prev
- [_g_] first
- [_G_] last
-"
-  ("j" flycheck-next-error)
-  ("k" flycheck-previous-error)
-  ("g" flycheck-first-error)
-  ("G" (progn (goto-char (point-max)) (flycheck-previous-error)))
-  ("q" nil))
+
+
+
+
 
 ;; Custom mode line
 ;; 
@@ -173,8 +130,7 @@
 			mode-line-buffer-identification)))
 	       "    ("
 	       '(:eval (propertize mode-name (quote face) (quote bold)))
-	       '(:eval (if (bound-and-true-p flycheck-mode)
-			   (flycheck-mode-line-text)))
+
 	       ")    "
 	       ))
 
@@ -283,15 +239,12 @@
 
 (use-package lsp-ui
   :ensure t
-  :requires lsp-mode flycheck
+  :requires lsp-mode
   :config (setq lsp-ui-doc-enable t
 		lsp-ui-doc-use-childframe 5
 		lsp-ui-doc-position 'top
 		lsp-ui-doc-include-signature t
 		lsp-ui-sideline-enable nil
-		lsp-ui-flycheck-enable t
-		lsp-ui-flycheck-list-position 'right
-		lsp-ui-flycheck-live-reporting t
 		lsp-ui-peek-enable t
 		lsp-ui-peek-list-width 60
 		lsp-ui-peek-peek-height 25)
@@ -344,11 +297,9 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
-   (quote
-    ("998f0949f8abd0ad3ca9a210c455ccf2f75e7273bedfd1da48e889acc38bacf9" "9324e79bc126f49a289aaccbe207b3ba6f2ce7ebc077ca6eb96f9864ecf860c2" default)))
+   '("998f0949f8abd0ad3ca9a210c455ccf2f75e7273bedfd1da48e889acc38bacf9" "9324e79bc126f49a289aaccbe207b3ba6f2ce7ebc077ca6eb96f9864ecf860c2" default))
  '(package-selected-packages
-   (quote
-    (flycheck undo-tree editorconfig projectile-ripgrep ripgrep hydra ivy-hydra counsel-projectile projectile counsel ivy swiper forge magit rjsx-mode key-chord yasnippet web-mode company-lsp lsp-mode lsp-ui use-package abyss-theme))))
+   '(flymake-sass flymake-css flymake-php flymake-eslint undo-tree editorconfig projectile-ripgrep ripgrep hydra ivy-hydra counsel-projectile projectile counsel ivy swiper forge magit rjsx-mode key-chord yasnippet web-mode company-lsp lsp-mode lsp-ui use-package abyss-theme)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
