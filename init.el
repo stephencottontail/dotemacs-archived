@@ -71,23 +71,10 @@
   ("K"  projectile-kill-buffers)
   ("q"  nil "cancel" :color blue))
 
-;; Flycheck
-;;
-;; FIXME: checking doesn't work for JS
-;;
-;; this is because Emacs can't find a configuration file
-;; for `eslint`, but i'm not confident enough yet to
-;; introduce it to LC projects; i need to research if
-;; i can set a global configuration file that wouldn't
-;; need to be included in an LC repo
+;; General flymake setup
 (require 'flymake)
-
-
-
-
-
-
-
+(define-key flymake-mode-map (kbd "M-n") 'flymake-goto-next-error)
+(define-key flymake-mode-map (kbd "M-p") 'flymake-goto-prev-error)
 
 ;; Custom mode line
 ;; 
