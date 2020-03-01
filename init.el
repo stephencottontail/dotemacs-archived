@@ -71,66 +71,10 @@
   ("K"  projectile-kill-buffers)
   ("q"  nil "cancel" :color blue))
 
-;; Flycheck
-;;
-;; FIXME: checking doesn't work for JS
-;;
-;; this is because Emacs can't find a configuration file
-;; for `eslint`, but i'm not confident enough yet to
-;; introduce it to LC projects; i need to research if
-;; i can set a global configuration file that wouldn't
-;; need to be included in an LC repo
-(use-package flycheck
-  :ensure t
-  :bind ("C-c f" . skd/flycheck-hydra/body)
-  :init (add-hook 'flycheck-status-changed-functions #'flycheck-mode-line-text)
-  (add-hook 'flycheck-mode-hook #'flycheck-mode-line-text)
-  :config (global-flycheck-mode 1)
-  (flycheck-add-mode (quote php) (quote web-mode)))
-
-(defface skd/flycheck-error-status '((t)) "If Flycheck reports an error during a check" :group (quote skd-custom-font-faces))
-(defface skd/flycheck-interrupted-status '((t)) "If Flycheck is interrupted while performing a check" :group (quote skd-custom-font-faces))
-(defface skd/flycheck-suspicious-status '((t)) "If Flycheck reports a suspicious state during a check" :group (quote skd-custom-font-faces))
-(defface skd/flycheck-error-count '((t)) "The number of errors that Flycheck reports" :group (quote skd-custom-font-faces))
-(defface skd/flycheck-warning-count '((t)) "The number of warnings that Flycheck reports" :group (quote skd-custom-font-faces))
-(defface skd/flycheck-info-count '((t)) "The number of informational messages that Flycheck reports" :group (quote skd-custom-font-faces))
-
-(defun flycheck-mode-line-text (&optional status)
-  "Return appropriate mode line text depending on STATUS."
-  (let ((text
-	 (pcase (or flycheck-last-status-change)
-	   ('finished (when flycheck-current-errors
-			(let-alist (flycheck-count-errors flycheck-current-errors)
-			  (let ((error (or .error 0))
-				(warning (or .warning 0))
-				(info (or .info 0)))
-			    (format " %s/%s/%s"
-				    (propertize (number-to-string error) (quote face) (quote skd/flycheck-error-count))
-				    (propertize (number-to-string warning) (quote face) (quote skd/flycheck-warning-count))
-				    (propertize (number-to-string info) (quote face) (quote skd/flycheck-info-count)))))))
-	   ('not-checked nil)
-	   ('no-checker (propertize " -" (quote face) (quote bold)))
-	   ('running nil)
-	   ('errored (propertize " !" (quote face) (quote skd/flychecker-error-status)))
-	   ('interrupted (propertize " X" (quote face) (quote skd/flychecker-interrupted-status)))
-	   ('suspicious (propertize " ?" (quote face) (quote skd/flychecker-suspicious-status)))
-	   (_ nil))))
-    (concat " / Fly" text)))
-
-(defhydra skd/flycheck-hydra (:pre (flycheck-list-errors) :post (quit-windows-on "*Flycheck errors*") :hint nil)
-  "
- Errors^^
--------------------------------------------------------------------------------------
- [_j_] next
- [_k_] prev
- [_g_] first
- [_G_] last
-"
-  ("j" flycheck-next-error)
-  ("k" flycheck-previous-error)
-  ("g" flycheck-first-error)
-  ("G" (progn (goto-char (point-max)) (flycheck-previous-error)))
-  ("q" nil))
+;; General flymake setup
+(require 'flymake)
+(define-key flymake-mode-map (kbd "M-n") 'flymake-goto-next-error)
+(define-key flymake-mode-map (kbd "M-p") 'flymake-goto-prev-error)
 
 ;; Custom mode line
 ;; 
@@ -159,6 +103,20 @@
       (setq out (replace-regexp-in-string (car cur) (car (cdr cur)) out)))
     out))
 
+;; Let's use the default major/minor modes code and hide
+;; the minor modes I don't care about. Not because I couldn't
+;; understand the code that flymake uses to count the
+;; number of errors, mind you, I'm just making an effort
+;; to use Emacs' built-in code
+(use-package delight
+  :init (delight '((global-auto-revert-mode nil "autorevert")
+		   (auto-revert-mode nil "autorevert")
+		   (auto-revert-tail-mode nil "autorevert")
+		   (company-mode nil "company")
+		   (ivy-mode nil "ivy")
+		   (editorconfig-mode nil "editorconfig")
+		   (eldoc-mode nil "eldoc"))))
+
 (setq-default mode-line-format
 	      (list
 	       '(:eval
@@ -171,11 +129,8 @@
 			(propertize (generate-replacement-tags (buffer-file-name)) (quote face) (quote skd/replacement-tags)))
 		       (t
 			mode-line-buffer-identification)))
-	       "    ("
-	       '(:eval (propertize mode-name (quote face) (quote bold)))
-	       '(:eval (if (bound-and-true-p flycheck-mode)
-			   (flycheck-mode-line-text)))
-	       ")    "
+	       "  "
+	       '(:eval mode-line-modes)
 	       ))
 
 ;; Control how Emacs makes backups
@@ -198,17 +153,41 @@
 (add-to-list (quote custom-theme-load-path) (concat (file-name-directory user-init-file) "themes"))
 (load-theme (quote alabaster) t)
 
-;; Setup Web mode
+;; HTML/PHP/Sass development
 (use-package web-mode
   :ensure t
   :init (setq web-mode-block-padding -1)
   (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
   (add-to-list 'auto-mode-alist '("\\.php\\'" . web-mode))
   (add-to-list 'auto-mode-alist '("\\.blade\\.php" . web-mode))
+  (add-hook 'web-mode-hook 'flymake-mode))
 
-  ;; Load correct JS mode depending on file type
-  (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
-  (add-to-list 'auto-mode-alist '("\\.jsx\\'" . rjsx-mode)))
+(use-package flymake-php
+  ;; Without setting this variable, flymake was putting temp files into
+  ;; the same folder, but when I set the variable, flymake was putting
+  ;; temp files into `tmp/`, not the folder I specfied. :fancy-shrug:
+  :init (setq tempdir (concat (file-name-directory user-init-file) "flymake-php"))
+  (add-hook 'web-mode-hook 'flymake-php-load))
+
+;; flymake-sass seems to be a bit out-of-date and
+;; I don't have the time or the inclination to wrangle it
+;; into shape
+
+;; JS/React development
+(add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
+(add-to-list 'auto-mode-alist '("\\.jsx\\'" . js-mode))
+;; flymake-eslint.el exposes a variable
+;; 'flymake-eslint-executable-args` which could in theory
+;; allow me to pass a different config file depending on
+;; the file, must examine this further
+(use-package flymake-eslint
+  :ensure t
+  :init
+  (add-hook 'js-mode-hook 'flymake-eslint-enable)
+  (add-hook 'js2-mode-hook 'flymake-eslint-enable)
+  (add-hook 'js-mode-hook (lambda ()
+			    (pcase (file-name-extension (buffer-file-name))
+			      ("jsx" (funcall 'js2-minor-mode))))))
 
 ;; Setup LSP
 ;;
@@ -283,15 +262,12 @@
 
 (use-package lsp-ui
   :ensure t
-  :requires lsp-mode flycheck
+  :requires lsp-mode
   :config (setq lsp-ui-doc-enable t
 		lsp-ui-doc-use-childframe 5
 		lsp-ui-doc-position 'top
 		lsp-ui-doc-include-signature t
 		lsp-ui-sideline-enable nil
-		lsp-ui-flycheck-enable t
-		lsp-ui-flycheck-list-position 'right
-		lsp-ui-flycheck-live-reporting t
 		lsp-ui-peek-enable t
 		lsp-ui-peek-list-width 60
 		lsp-ui-peek-peek-height 25)
@@ -344,11 +320,9 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
-   (quote
-    ("998f0949f8abd0ad3ca9a210c455ccf2f75e7273bedfd1da48e889acc38bacf9" "9324e79bc126f49a289aaccbe207b3ba6f2ce7ebc077ca6eb96f9864ecf860c2" default)))
+   '("998f0949f8abd0ad3ca9a210c455ccf2f75e7273bedfd1da48e889acc38bacf9" "9324e79bc126f49a289aaccbe207b3ba6f2ce7ebc077ca6eb96f9864ecf860c2" default))
  '(package-selected-packages
-   (quote
-    (flycheck undo-tree editorconfig projectile-ripgrep ripgrep hydra ivy-hydra counsel-projectile projectile counsel ivy swiper forge magit rjsx-mode key-chord yasnippet web-mode company-lsp lsp-mode lsp-ui use-package abyss-theme))))
+   '(delight flymake-sass flymake-css flymake-php flymake-eslint undo-tree editorconfig projectile-ripgrep ripgrep hydra ivy-hydra counsel-projectile projectile counsel ivy swiper forge magit rjsx-mode key-chord yasnippet web-mode company-lsp lsp-mode lsp-ui use-package abyss-theme)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
