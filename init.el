@@ -154,17 +154,37 @@
 (add-to-list (quote custom-theme-load-path) (concat (file-name-directory user-init-file) "themes"))
 (load-theme (quote alabaster) t)
 
-;; Setup Web mode
+;; HTML/PHP/Sass development
 (use-package web-mode
   :ensure t
   :init (setq web-mode-block-padding -1)
   (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
   (add-to-list 'auto-mode-alist '("\\.php\\'" . web-mode))
   (add-to-list 'auto-mode-alist '("\\.blade\\.php" . web-mode))
+  (add-hook 'web-mode-hook 'flymake-mode))
 
-  ;; Load correct JS mode depending on file type
-  (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
-  (add-to-list 'auto-mode-alist '("\\.jsx\\'" . rjsx-mode)))
+(use-package flymake-php
+  :init (add-hook 'web-mode-hook 'flymake-php-load))
+
+;; flymake-sass seems to be a bit out-of-date and
+;; I don't have the time or the inclination to wrangle it
+;; into shape
+
+;; JS/React development
+(add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
+(add-to-list 'auto-mode-alist '("\\.jsx\\'" . js-mode))
+;; flymake-eslint.el exposes a variable
+;; 'flymake-eslint-executable-args` which could in theory
+;; allow me to pass a different config file depending on
+;; the file, must examine this further
+(use-package flymake-eslint
+  :ensure t
+  :init
+  (add-hook 'js-mode-hook 'flymake-eslint-enable)
+  (add-hook 'js2-mode-hook 'flymake-eslint-enable)
+  (add-hook 'js-mode-hook (lambda ()
+			    (pcase (file-name-extension (buffer-file-name))
+			      ("jsx" (funcall 'js2-minor-mode))))))
 
 ;; Setup LSP
 ;;
