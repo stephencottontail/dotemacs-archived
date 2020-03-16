@@ -1,7 +1,15 @@
-;; Use MELPA for packages
+;; Set up so `use-package` can install itself
 (require (quote package))
-(package-initialize)
+(setq package-enable-at-startup nil)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+(package-initialize)
+
+(unless (package-installed-p (quote use-package))
+  (package-refresh-contents)
+  (package-install (quote use-package)))
+
+(eval-when-compile
+  (require (quote use-package)))
 
 ;; Global keybinds
 (global-set-key (kbd "M-<SPC>") 'set-mark-command)
