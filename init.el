@@ -2,6 +2,7 @@
 (require (quote package))
 (setq package-enable-at-startup nil)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+(add-to-list 'package-archives '("gnu" . "http://elpa.gnu.org/packages/") t)
 (package-initialize)
 
 (unless (package-installed-p (quote use-package))
@@ -120,6 +121,7 @@
 ;; number of errors, mind you, I'm just making an effort
 ;; to use Emacs' built-in code
 (use-package delight
+  :ensure t
   :init (delight '((global-auto-revert-mode nil "autorevert")
 		   (auto-revert-mode nil "autorevert")
 		   (auto-revert-tail-mode nil "autorevert")
