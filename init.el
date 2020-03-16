@@ -17,16 +17,19 @@
 ;; Setup stacking hydras
 ;;
 ;; see https://github.com/abo-abo/hydra/wiki/Nesting-Hydras
-(defvar hydra-stack nil "Holds the current and previous hydra.")
+(use-package hydra
+  :ensure t
+  :config
+  (defvar hydra-stack nil "Holds the current and previous hydra.")
 
-(defun hydra-push (expr)
-  (push '(lambda () ,expr) hydra-stack))
+  (defun hydra-push (expr)
+    (push '(lambda () ,expr) hydra-stack))
 
-(defun hydra-pop ()
-  (interactive)
-  (let ((x (pop hydra-stack)))
-    (when x
-      (funcall x))))
+  (defun hydra-pop ()
+    (interactive)
+    (let ((x (pop hydra-stack)))
+      (when x
+	(funcall x)))))
 
 ;; Editorconfig
 (use-package editorconfig
