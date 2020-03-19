@@ -176,6 +176,7 @@
   (add-hook 'web-mode-hook 'flymake-mode))
 
 (use-package flymake-php
+  :ensure t
   ;; Without setting this variable, flymake was putting temp files into
   ;; the same folder, but when I set the variable, flymake was putting
   ;; temp files into `tmp/`, not the folder I specfied. :fancy-shrug:
@@ -187,6 +188,9 @@
 ;; into shape
 
 ;; JS/React development
+(use-package js2-mode
+  :ensure t)
+
 (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
 (add-to-list 'auto-mode-alist '("\\.jsx\\'" . js-mode))
 ;; `flymake-eslint-executable-args` could possibly be used
@@ -334,7 +338,7 @@
  '(custom-safe-themes
    '("998f0949f8abd0ad3ca9a210c455ccf2f75e7273bedfd1da48e889acc38bacf9" "9324e79bc126f49a289aaccbe207b3ba6f2ce7ebc077ca6eb96f9864ecf860c2" default))
  '(package-selected-packages
-   '(delight flymake-sass flymake-css flymake-php flymake-eslint undo-tree editorconfig projectile-ripgrep ripgrep hydra ivy-hydra counsel-projectile projectile counsel ivy swiper forge magit rjsx-mode key-chord yasnippet web-mode company-lsp lsp-mode lsp-ui use-package abyss-theme)))
+   '(js2-mode delight flymake-sass flymake-css flymake-php flymake-eslint undo-tree editorconfig projectile-ripgrep ripgrep hydra ivy-hydra counsel-projectile projectile counsel ivy swiper forge magit rjsx-mode key-chord yasnippet web-mode company-lsp lsp-mode lsp-ui use-package abyss-theme)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
