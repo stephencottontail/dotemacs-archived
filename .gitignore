@@ -1,5 +1,5 @@
-auto-save-list/
-auto-save-list/**
-
-elpa/
-elpa/**
+**
+!.gitignore
+!init.el
+!themes
+!themes/**
