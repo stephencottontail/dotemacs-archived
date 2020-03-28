@@ -167,12 +167,16 @@
 (load-theme (quote alabaster) t)
 
 ;; HTML/PHP/Sass development
+;;
+;; FIXME: rework colors in Sass/CSS to more closely match other languages
 (use-package web-mode
   :ensure t
   :init (setq web-mode-block-padding -1)
   (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
   (add-to-list 'auto-mode-alist '("\\.php\\'" . web-mode))
   (add-to-list 'auto-mode-alist '("\\.blade\\.php" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.css\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.scss\\'" . web-mode))
   (add-hook 'web-mode-hook 'flymake-mode))
 
 (use-package flymake-php
@@ -336,7 +340,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
-   '("998f0949f8abd0ad3ca9a210c455ccf2f75e7273bedfd1da48e889acc38bacf9" "9324e79bc126f49a289aaccbe207b3ba6f2ce7ebc077ca6eb96f9864ecf860c2" default))
+   '("9edd77bca0e6f00421343e1d40e98f8545ee99798a42ee32a9d2dc62f5ab63d8" "998f0949f8abd0ad3ca9a210c455ccf2f75e7273bedfd1da48e889acc38bacf9" "9324e79bc126f49a289aaccbe207b3ba6f2ce7ebc077ca6eb96f9864ecf860c2" default))
  '(package-selected-packages
    '(js2-mode delight flymake-sass flymake-css flymake-php flymake-eslint undo-tree editorconfig projectile-ripgrep ripgrep hydra ivy-hydra counsel-projectile projectile counsel ivy swiper forge magit rjsx-mode key-chord yasnippet web-mode company-lsp lsp-mode lsp-ui use-package abyss-theme)))
 (custom-set-faces

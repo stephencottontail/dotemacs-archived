@@ -66,6 +66,11 @@
    `(skd/flycheck-error-count         ((,class (:foreground ,gray-3 :background ,red))))
    `(skd/flycheck-warning-count       ((,class (:foreground ,gray-3 :background ,yellow-dark))))
    `(skd/flycheck-info-count          ((,class (:foreground ,gray-3 :background ,green))))
+
+   ;; Web-mode
+   `(web-mode-css-property-name-face  ((,class (:foreground ,gray-3 :background ,gray-1))))
+   `(web-mode-css-pseudo-class-face   ((,class (:foreground ,gray-3 :background ,gray-1))))
+   `(web-mode-css-function-face       ((,class (:foreground ,gray-3 :background ,blue))))
    
    ;; Dired
    `(dired-ignored ((,class (:foreground ,gray-3))))
