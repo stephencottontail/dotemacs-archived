@@ -15,6 +15,9 @@
 ;; Global keybinds
 (global-set-key (kbd "M-<SPC>") 'set-mark-command)
 
+;; Move point by actual line
+(setq line-move-visual nil)
+
 ;; Setup stacking hydras
 ;;
 ;; see https://github.com/abo-abo/hydra/wiki/Nesting-Hydras
@@ -171,13 +174,21 @@
 ;; FIXME: rework colors in Sass/CSS to more closely match other languages
 (use-package web-mode
   :ensure t
-  :init (setq web-mode-block-padding -1)
+  :init (setq web-mode-block-padding -1
+	      web-mode-markup-indent-offset 0
+	      web-mode-css-indent-offset 0
+	      web-mode-code-indent-offset 0)
+  
   (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
   (add-to-list 'auto-mode-alist '("\\.php\\'" . web-mode))
   (add-to-list 'auto-mode-alist '("\\.blade\\.php" . web-mode))
   (add-to-list 'auto-mode-alist '("\\.css\\'" . web-mode))
   (add-to-list 'auto-mode-alist '("\\.scss\\'" . web-mode))
-  (add-hook 'web-mode-hook 'flymake-mode))
+  (add-hook 'web-mode-hook 'flymake-mode)
+  (add-hook 'local-write-file-hooks
+	    (lambda ()
+	      (delete-trailing-whitespace)
+	      nil)))
 
 (use-package flymake-php
   :ensure t
